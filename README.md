@@ -18,25 +18,65 @@ Experiments\   训练和评估输出
 
 ## 环境依赖
 
-`requirements.txt` 当前内容：
+推荐使用 **Python 3.12**（与当前 Kaggle / Colab 基础镜像一致）。
+
+`requirements.txt` 当前内容（**与 Kaggle GPU 环境对齐**：官方镜像基于 Colab `release-colab-external-images_20260416`，对应 **PyTorch 2.10.0**）：
 
 ```text
-numpy<2
-torch==2.8.0
-torchaudio==2.8.0
+numpy==2.4.4
+torch==2.10.0
+torchvision==0.25.0
+torchaudio==2.10.0
 lightning==2.5.1.post0
 soundfile==0.13.1
-PyYAML==6.0.2
+PyYAML==6.0.3
 pytest==7.4.4
-huggingface_hub==1.1.2
+huggingface_hub==1.14.0
 asteroid_filterbanks==0.4.0
 tqdm==4.67.1
 ```
 
-安装：
+### 与 Kaggle 对齐（本机安装）
+
+在 Kaggle Notebook 中预装环境已满足上述栈；在 **Windows 本机**若需 **CUDA 12.8** 的 PyTorch wheel（与 Colab/Kaggle 常用的 cu128 构建一致），请加上 PyTorch 官方额外索引，避免只装到 CPU 轮子：
+
+```powershell
+python -m pip install -U pip
+python -m pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu128
+```
+
+仅 CPU 或已手动装好匹配版本的 `torch` / `torchaudio` 时，可直接：
 
 ```powershell
 python -m pip install -r requirements.txt
+```
+
+### Kaggle 上遇到 `torchvision::nms does not exist`
+
+这通常表示 `torch` 与 `torchvision` 的 wheel 不配套，或其中一个被单独升级过。仓库依赖现在显式固定为：
+
+```text
+torch==2.10.0
+torchvision==0.25.0
+torchaudio==2.10.0
+```
+
+在 Kaggle Notebook 里建议直接强制重装这三个包，再启动训练：
+
+```bash
+pip install -U --no-cache-dir --force-reinstall torch==2.10.0 torchvision==0.25.0 torchaudio==2.10.0 --extra-index-url https://download.pytorch.org/whl/cu128
+```
+
+装完后先做一次导入检查：
+
+```bash
+python -c "import torch, torchvision, torchaudio; print(torch.__version__, torchvision.__version__, torchaudio.__version__)"
+```
+
+如果这里能正常输出版本号，再运行训练入口：
+
+```bash
+python -m trainers.e1_smoke_train --config configs/kaggle/e1_teacher_smoke_train-kaggle.yaml
 ```
 
 ## 数据准备
@@ -151,7 +191,9 @@ python DataPreProcess/process_librimix.py \
   --out_dir /kaggle/working/DataPreProcess/MiniLibriMix
 ```
 
-**2）建索引**（`--in_dir` 必须与 YAML 里 `data.root` 相同；`--speakers` 须与 `process_librimix.py` 一致，默认 `mix_both s1 s2`）：
+若数据集路径或说话人条件子目录不同（例如仅 `mix_clean`），请相应修改 `--in_dir` / 输出目录，并与下面建索引的 `--speakers` 一致。
+
+**2）建索引**（`--in_dir` 必须与 YAML 里 `data.root` 或索引根一致；`--speakers` 须与 `process_librimix.py` 一致，默认 `mix_both s1 s2`）：
 
 ```bash
 python -m data.build_index \
@@ -175,6 +217,7 @@ python -m data.build_index \
 | `configs/kaggle/e1_teacher_smoke_train-kaggle.yaml` | E1：`data.train_dir` / `data.valid_dir` 指向含 JSON 的 split 目录（与 TIGER `train_dir`/`valid_dir` 一致） |
 | `configs/kaggle/e1_teacher_smoke_train-kaggle-mini.yaml` | 快速联调：`mini_debug` + 限制 train/val 样本数 |
 | `configs/kaggle/e2_*` … `e7_*` | 与本地 `configs/e2`–`e7` 占位配置对齐，checkpoint 等路径改为 `/kaggle/working/...` |
+
 
 训练（在仓库根目录执行，配置使用 POSIX 路径）：
 

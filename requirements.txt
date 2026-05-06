@@ -1,10 +1,13 @@
-numpy<2
-torch==2.8.0
-torchaudio==2.8.0
+# Aligned with Kaggle GPU image: Colab runtime 20260416 (PyTorch 2.10.0, Python 3.12).
+# For CUDA wheels on Windows, use: pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cu128
+numpy==2.4.4
+torch==2.10.0
+torchvision==0.25.0
+torchaudio==2.10.0
 lightning==2.5.1.post0
 soundfile==0.13.1
-PyYAML==6.0.2
+PyYAML==6.0.3
 pytest==7.4.4
-huggingface_hub==1.1.2
+huggingface_hub==1.14.0
 asteroid_filterbanks==0.4.0
 tqdm==4.67.1

@@ -1,17 +1,39 @@
 from __future__ import annotations
 
 import json
-from collections.abc import Sequence
+import os
+import sys
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
+
 import soundfile as sf
 import torch
+from tqdm.auto import tqdm
 from torch.utils.data import Dataset
 
 from utils.helper import get_by_path
 
 # 与 TIGER look2hear/datas/Libri2Mix16.py 一致：默认读取 mix_both.json + s1.json + s2.json。
 DEFAULT_SPEAKERS = ("mix_both", "s1", "s2")
+
+
+def _index_progress_disabled() -> bool:
+    """pytest 等场景可设 INDEX_BUILD_QUIET=1 关闭进度条。"""
+    return os.environ.get("INDEX_BUILD_QUIET", "").strip().lower() in ("1", "true", "yes")
+
+
+def _maybe_tqdm(iterable: Iterable[Path], *, desc: str) -> Iterable[Path]:
+    if _index_progress_disabled():
+        return iterable
+    return tqdm(
+        iterable,
+        desc=desc,
+        unit="wav",
+        file=sys.stderr,
+        dynamic_ncols=True,
+        leave=True,
+    )
 
 
 @dataclass(frozen=True)
@@ -44,11 +66,11 @@ def _select_aligned_files(split_dir: Path, count: int, speakers: tuple[str, ...]
     return selected
 
 
-def _write_index_file(paths: list[Path], out_path: Path) -> None:
+def _write_index_file(paths: list[Path], out_path: Path, *, desc: str) -> None:
     """与 TIGER 一致：用 SoundFile 取帧数，JSON indent=4。"""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     file_infos: list[list[object]] = []
-    for wav_path in paths:
+    for wav_path in _maybe_tqdm(paths, desc=desc):
         samples = sf.SoundFile(str(wav_path))
         file_infos.append([str(wav_path.resolve()), int(len(samples))])
     with out_path.open("w", encoding="utf-8") as handle:
@@ -87,7 +109,7 @@ def build_mini_librimix_index(
                     raise ValueError(f"Split '{split}' has misaligned filenames across speakers")
 
         for speaker, paths in selected.items():
-            _write_index_file(paths, output_root / split / f"{speaker}.json")
+            _write_index_file(paths, output_root / split / f"{speaker}.json", desc=f"{split}/{speaker}")
 
 
 def ensure_json_index(
