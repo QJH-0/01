@@ -20,7 +20,7 @@ Experiments\   训练和评估输出
 
 推荐使用 **Python 3.12**（与当前 Kaggle / Colab 基础镜像一致）。
 
-`requirements.txt` 当前内容（**与 Kaggle GPU 环境对齐**：官方镜像基于 Colab `release-colab-external-images_20260416`，对应 **PyTorch 2.10.0**）：
+`requirements.txt` 当前内容（**与 Kaggle 基础镜像同源 Colab 栈**：`release-colab-external-images_20260416`，**PyTorch 2.10.0**；另含本仓库训练/测试所需的固定版本）：
 
 ```text
 numpy==2.4.4
@@ -36,9 +36,17 @@ asteroid_filterbanks==0.4.0
 tqdm==4.67.1
 ```
 
+**在 Kaggle Notebook 里**请勿直接全量 `pip install -r requirements.txt`。镜像已在 [Kaggle/docker-python](https://github.com/Kaggle/docker-python) 中合并 Colab 运行时与 `kaggle_requirements.txt`（TensorFlow、s3fs、gcsfs、ydata-profiling 等）；再强行安装其中的 `numpy` / `torch` / `fsspec` 等会与这些预装包的**声明依赖**冲突，pip 会打印一长串 “dependency conflicts”（多为解析器无法在同一环境里同时满足所有元数据，而非你少装了某个包）。请改用 **`requirements-kaggle.txt`**，只补充本项目用到的 `lightning`（`lightning.pytorch`，与镜像里的 `pytorch-lightning` 包名不同）、`asteroid_filterbanks` 等：
+
+```bash
+pip install -q -r requirements-kaggle.txt
+```
+
+说明：官方镜像构建时会 `uninstall google-cloud-bigquery-storage`（见上述仓库的 `Dockerfile.tmpl`），因此与 `bigquery-storage` 相关的提示可忽略，除非你要自行启用 BigQuery Storage API。若仍遇 pip 解析问题，可尝试 `pip install -r requirements-kaggle.txt --use-deprecated=legacy-resolver`（权宜之计，可能掩盖真实冲突）。
+
 ### 与 Kaggle 对齐（本机安装）
 
-在 Kaggle Notebook 中预装环境已满足上述栈；在 **Windows 本机**若需 **CUDA 12.8** 的 PyTorch wheel（与 Colab/Kaggle 常用的 cu128 构建一致），请加上 PyTorch 官方额外索引，避免只装到 CPU 轮子：
+在 Kaggle Notebook 中 **`torch` / `numpy` 等已由镜像提供**；仅需按上一节安装 `requirements-kaggle.txt`。在 **Windows 本机**若需 **CUDA 12.8** 的 PyTorch wheel（与 Colab/Kaggle 常用的 cu128 构建一致），请加上 PyTorch 官方额外索引，避免只装到 CPU 轮子：
 
 ```powershell
 python -m pip install -U pip
@@ -181,19 +189,19 @@ python -m trainers.e1_smoke_train --config configs\e1_teacher_smoke_train.yaml -
 
 约定与 `D:\Paper\TIGER\configs` 下 Kaggle 模板一致：**原始数据**挂在 `/kaggle/input/...`，**预处理结果、索引与实验输出**写在 `/kaggle/working/...`；适当提高 `runtime.num_workers`、开启 `pin_memory: true`，GPU 上使用 `runtime.precision: 16-mixed`。
 
-推荐流水线：先把 Input 里的 MiniLibriMix 预处理到 working（与 TIGER 一致），再对**预处理后的根目录**建索引并训练。
-
-**1）预处理**（`--in_dir` 为 Kaggle 数据集挂载路径，`--out_dir` 为 working 下输出）。脚本与 TIGER 工程中的 `DataPreProcess/process_librimix.py` 一致；若本仓库未包含该文件，请在 Notebook 中挂载或复制同脚本后再执行：
+**1）依赖**（在已添加本仓库为 Notebook 数据源、工作目录为仓库根的前提下）：
 
 ```bash
-python DataPreProcess/process_librimix.py \
-  --in_dir /kaggle/input/MiniLibriMix \
-  --out_dir /kaggle/working/DataPreProcess/MiniLibriMix
+pip install -q -r requirements-kaggle.txt
 ```
 
-若数据集路径或说话人条件子目录不同（例如仅 `mix_clean`），请相应修改 `--in_dir` / 输出目录，并与下面建索引的 `--speakers` 一致。
+**2）预处理 / 建索引示例**（路径按你的 Input 数据集名称修改；`--speakers` 须与数据与 YAML 一致）：
 
-**2）建索引**（`--in_dir` 必须与 YAML 里 `data.root` 或索引根一致；`--speakers` 须与 `process_librimix.py` 一致，默认 `mix_both s1 s2`）：
+```bash
+python -m data.build_index --in_dir /kaggle/input/datasets/qjhkaggle/minilibrimix/MiniLibriMix --out_dir /kaggle/working/DataPreProcess/MiniLibriMix --speakers mix_clean s1 s2
+```
+
+**3）建索引**（`--in_dir` 必须与 YAML 里 `data.root` 或索引根一致；`--speakers` 须与 `process_librimix.py` 一致，默认 `mix_both s1 s2`）：
 
 ```bash
 python -m data.build_index \

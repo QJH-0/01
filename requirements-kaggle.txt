@@ -1,0 +1,11 @@
+# Kaggle Notebook（GPU/CPU）：只补充镜像里通常没有或与 Colab 栈不冲突的包。
+# 不要在此文件里固定 torch / torchvision / torchaudio / numpy，以免与镜像内 TensorFlow、
+# numba、s3fs、gcsfs、google-adk 等预装包的声明依赖冲突；基础栈已由
+# Kaggle/docker-python（Colab release-colab-external-images_20260416）对齐。
+# 参考：https://github.com/Kaggle/docker-python/blob/main/Dockerfile.tmpl
+lightning==2.5.1.post0
+asteroid_filterbanks==0.4.0
+soundfile==0.13.1
+PyYAML==6.0.3
+huggingface_hub==1.14.0
+tqdm==4.67.1
