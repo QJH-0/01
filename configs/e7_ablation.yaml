@@ -1,0 +1,11 @@
+# 计算设备说明：占位配置，训练入口未接。实现后见 configs/e1_teacher_smoke_train.yaml 文件头（auto/cuda/cpu）。
+experiment:
+  name: e7_ablation
+
+model:
+  student_checkpoint: "checkpoints/e4_btcn_best.pth"
+
+train:
+  ablation_target: rda
+
+notes: Placeholder config for E7.

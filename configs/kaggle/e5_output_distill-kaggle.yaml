@@ -1,0 +1,14 @@
+# Kaggle 占位配置（与 configs/e5_output_distill.yaml 对齐）。
+# 计算设备说明：占位；意图 GPU 训练。接入后 runtime.device 建议 auto 或 cuda。
+
+experiment:
+  name: e5_output_distill
+
+model:
+  teacher_checkpoint: /kaggle/working/checkpoints/e1_teacher.pth
+  student_checkpoint: /kaggle/working/checkpoints/e4_btcn_best.pth
+
+output:
+  root_dir: /kaggle/working/Experiments
+
+notes: Placeholder config for E5.

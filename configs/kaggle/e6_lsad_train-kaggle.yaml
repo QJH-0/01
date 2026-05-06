@@ -1,0 +1,18 @@
+# Kaggle 占位配置（与 configs/e6_lsad_train.yaml 对齐）。
+# 计算设备说明：占位；意图 GPU 训练。接入后 runtime.device 建议 auto 或 cuda。
+
+experiment:
+  name: e6_lsad_train
+
+model:
+  teacher_checkpoint: /kaggle/working/checkpoints/e1_teacher.pth
+  student_checkpoint: /kaggle/working/checkpoints/e4_btcn_best.pth
+
+train:
+  distill_block_indices: [7, 15, 23]
+  lambda_distill: 0.05
+
+output:
+  root_dir: /kaggle/working/Experiments
+
+notes: Placeholder config for E6.

@@ -1,0 +1,14 @@
+# Kaggle 占位配置（与 configs/e2_naive_bw_wa.yaml 对齐）；路径指向 working。
+# 计算设备说明：占位；设计意图为 Kaggle GPU Notebook（与开启 GPU 的会话一致）。训练脚本接入后请设置 runtime.device（建议 auto 或 cuda）。
+
+experiment:
+  name: e2_naive_bw_wa
+
+model:
+  teacher_checkpoint: /kaggle/working/checkpoints/e1_teacher.pth
+  binarization_mode: bw
+
+output:
+  root_dir: /kaggle/working/Experiments
+
+notes: Placeholder config for E2.

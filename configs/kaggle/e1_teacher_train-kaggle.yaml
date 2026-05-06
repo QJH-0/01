@@ -1,0 +1,73 @@
+# Kaggle Notebook / 双 T4（T4×2，DDP 双卡）
+# 计算设备：意图为 GPU。runtime.device=auto 时，若 Notebook 已开启 GPU 且驱动正常则走 cuda；若当前会话无 GPU 则退化为 cpu（极慢）。
+#           可改为 cuda 强制 GPU（无 GPU 会失败）；一般不建议在 Kaggle 训练任务中用 cpu。
+# 全局有效 batch ≈ runtime.batch_size × GPU 数（本配置为 1×2=2）。若需与单卡对齐可酌情调 lr 或 batch。
+# 与 TIGER 一致：train_dir / valid_dir 为「含 mix_both.json、s1.json、s2.json」的目录。
+# 预处理：python DataPreProcess/process_librimix.py --in_dir /kaggle/input/MiniLibriMix --out_dir /kaggle/working/DataPreProcess/MiniLibriMix
+# 若 JSON 写在单独 DataIndex 下：python -m data.build_index --in_dir .../MiniLibriMix --out_dir /kaggle/working/DataIndex/default --speakers mix_both s1 s2
+
+experiment:
+  name: e1_teacher_smoke_train
+
+data:
+  train_dir: /kaggle/working/DataIndex/default/train
+  valid_dir: /kaggle/working/DataIndex/default/val
+  # 若 train/valid 目录下尚无 JSON，可填原始 MiniLibriMix 根目录以自动生成
+  root: /kaggle/working/DataPreProcess/MiniLibriMix
+  speakers: [mix_clean, s1, s2]
+  train_start_index: 0
+  val_start_index: 0
+  train_max_examples: null
+  val_max_examples: null
+
+model:
+  name: conv_tasnet_teacher
+  pretrained_id: JorisCos/ConvTasNet_Libri2Mix_sepclean_8k
+  checkpoint_path: null
+  model_args:
+    n_src: 2
+    out_chan: null
+    n_blocks: 8
+    n_repeats: 3
+    bn_chan: 128
+    hid_chan: 512
+    skip_chan: 128
+    conv_kernel_size: 3
+    norm_type: gLN
+    mask_act: relu
+    in_chan: null
+    causal: false
+    fb_name: free
+    kernel_size: 16
+    n_filters: 512
+    stride: 8
+    encoder_activation: null
+    sample_rate: 8000
+
+runtime:
+  # 与上一段「计算设备」一致；Kaggle GPU 实例上为 GPU 训练。
+  device: auto
+  # 双卡 GPU（每卡进程一个）；若改为 1 则单卡 GPU。
+  devices: 2
+  strategy: ddp
+  precision: 32
+  batch_size: 1
+  num_workers: 4
+  pin_memory: true
+  train_shuffle: false
+  val_shuffle: false
+  seed: 42
+
+train:
+  lr: 1.0e-5
+  epochs: 2
+  monitor: val_loss
+  monitor_mode: min
+  optimizer:
+    name: adam
+    weight_decay: 0.0
+    betas: [0.9, 0.999]
+    eps: 1.0e-8
+
+output:
+  root_dir: /kaggle/working/Experiments

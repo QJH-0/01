@@ -1,0 +1,10 @@
+numpy<2
+torch==2.8.0
+torchaudio==2.8.0
+lightning==2.5.1.post0
+soundfile==0.13.1
+PyYAML==6.0.2
+pytest==7.4.4
+huggingface_hub==1.1.2
+asteroid_filterbanks==0.4.0
+tqdm==4.67.1

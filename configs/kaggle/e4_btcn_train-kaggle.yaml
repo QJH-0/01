@@ -1,0 +1,14 @@
+# Kaggle 占位配置（与 configs/e4_btcn_train.yaml 对齐）。
+# 计算设备说明：占位；意图 GPU 训练。接入后 runtime.device 建议 auto 或 cuda。
+
+experiment:
+  name: e4_btcn_train
+
+model:
+  teacher_checkpoint: /kaggle/working/checkpoints/e1_teacher.pth
+
+output:
+  root_dir: /kaggle/working/Experiments
+  best_weights: /kaggle/working/checkpoints/e4_btcn_best.pth
+
+notes: Placeholder config for E4.

@@ -1,0 +1,69 @@
+# 计算设备：runtime.device
+#   auto — 若本机有可用 CUDA 则用 GPU（cuda），否则用 CPU。
+#   cuda — 强制 GPU；无可用 NVIDIA GPU 时会报错。
+#   cpu  — 强制 CPU（适合无显卡或纯调试）。
+experiment:
+  name: e1_teacher_smoke_train
+
+data:
+  # 与 TIGER Libri2MixModuleRemix 一致：每个 split 为「含 mix_both.json / s1.json / s2.json」的目录（wav 路径在 JSON 内）。
+  train_dir: "DataIndex/mini_debug/train"
+  valid_dir: "DataIndex/mini_debug/val"
+  # 若上述目录尚无 JSON，可设原始 MiniLibriMix 根目录以自动生成该 split 的索引
+  root: null
+  speakers: [mix_clean, s1, s2]
+  train_start_index: 0
+  val_start_index: 0
+  train_max_examples: null
+  val_max_examples: null
+
+model:
+  name: conv_tasnet_teacher
+  pretrained_id: JorisCos/ConvTasNet_Libri2Mix_sepclean_8k
+  checkpoint_path: null
+  model_args:
+    n_src: 2
+    out_chan: null
+    n_blocks: 8
+    n_repeats: 3
+    bn_chan: 128
+    hid_chan: 512
+    skip_chan: 128
+    conv_kernel_size: 3
+    norm_type: gLN
+    mask_act: relu
+    in_chan: null
+    causal: false
+    fb_name: free
+    kernel_size: 16
+    n_filters: 512
+    stride: 8
+    encoder_activation: null
+    sample_rate: 8000
+
+runtime:
+  # 见文件头「计算设备」；本地默认 auto（有显卡走 GPU）。
+  device: auto
+  # 单卡为 1；多卡见 configs/kaggle/ 下 E1。
+  devices: 1
+  precision: 32
+  batch_size: 1
+  num_workers: 0
+  pin_memory: null
+  train_shuffle: false
+  val_shuffle: false
+  seed: 42
+
+train:
+  lr: 1.0e-5
+  epochs: 2
+  monitor: val_loss
+  monitor_mode: min
+  optimizer:
+    name: adam
+    weight_decay: 0.0
+    betas: [0.9, 0.999]
+    eps: 1.0e-8
+
+output:
+  root_dir: "Experiments"

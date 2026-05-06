@@ -1,0 +1,57 @@
+{
+  "run_id": "20260506-224730",
+  "experiment_name": "e1_teacher_smoke_train",
+  "model_id": "JorisCos/ConvTasNet_Libri2Mix_sepclean_8k",
+  "data_root": "D:\\Paper\\01\\DataIndex\\mini_debug",
+  "train_dir": "D:\\Paper\\01\\DataIndex\\mini_debug\\train",
+  "valid_dir": "D:\\Paper\\01\\DataIndex\\mini_debug\\val",
+  "train_split": "train",
+  "val_split": "val",
+  "epochs": 2,
+  "steps_completed": 20,
+  "batch_size": 1,
+  "progress_bar": true,
+  "precision": "32",
+  "lr": 1e-05,
+  "monitor": "val_loss",
+  "monitor_mode": "min",
+  "best_metric": -14.846209,
+  "epoch_records": [
+    {
+      "epoch": 0,
+      "train_loss_last": -16.469908,
+      "train_loss_mean": -16.469908,
+      "val_loss_last": -14.846209,
+      "val_loss_mean": -14.846209,
+      "val_si_snri_last": 14.861327,
+      "val_si_snri_mean": 14.861327
+    },
+    {
+      "epoch": 1,
+      "train_loss_last": -16.573979,
+      "train_loss_mean": -16.573979,
+      "val_loss_last": -14.845493,
+      "val_loss_mean": -14.845493,
+      "val_si_snri_last": 14.86061,
+      "val_si_snri_mean": 14.86061
+    }
+  ],
+  "final_train_loss": -16.57398,
+  "final_val_loss": -14.845492,
+  "final_val_si_snri": 14.860611,
+  "run_checkpoint_dir": "Experiments\\e1_teacher_smoke_train\\results\\20260506-224730\\checkpoints",
+  "run_results_dir": "Experiments\\e1_teacher_smoke_train\\results\\20260506-224730",
+  "run_dir": "Experiments\\e1_teacher_smoke_train",
+  "experiment_dir": "Experiments\\e1_teacher_smoke_train",
+  "best_checkpoint_path": "Experiments\\e1_teacher_smoke_train\\checkpoints\\best.ckpt",
+  "last_checkpoint_path": "Experiments\\e1_teacher_smoke_train\\checkpoints\\last.ckpt",
+  "best_weights_path": "Experiments\\e1_teacher_smoke_train\\best_model.pth",
+  "history_csv_path": "Experiments\\e1_teacher_smoke_train\\results\\20260506-224730\\history.csv",
+  "best_model_path": "Experiments\\e1_teacher_smoke_train\\best_model.pth",
+  "best_model_score": -14.846209,
+  "logged_metrics": {
+    "train_loss": -16.57398,
+    "val_loss": -14.845492,
+    "val_si_snri": 14.860611
+  }
+}

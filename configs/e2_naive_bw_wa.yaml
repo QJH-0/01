@@ -1,0 +1,10 @@
+# 计算设备说明：占位配置，训练入口未接。实现后请与 E1 对齐设置 runtime.device：
+#   auto（有 CUDA 用 GPU）| cuda（强制 GPU）| cpu（强制 CPU）。Kaggle GPU Notebook 建议 auto 或 cuda。
+experiment:
+  name: e2_naive_bw_wa
+
+model:
+  teacher_checkpoint: "checkpoints/e1_teacher.pth"
+  binarization_mode: bw
+
+notes: Placeholder config for E2.

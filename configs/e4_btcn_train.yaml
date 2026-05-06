@@ -1,0 +1,11 @@
+# 计算设备说明：占位配置，训练入口未接。实现后见 configs/e1_teacher_smoke_train.yaml 文件头（auto/cuda/cpu）。
+experiment:
+  name: e4_btcn_train
+
+model:
+  teacher_checkpoint: "checkpoints/e1_teacher.pth"
+
+output:
+  best_weights: "checkpoints/e4_btcn_best.pth"
+
+notes: Placeholder config for E4.

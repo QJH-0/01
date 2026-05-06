@@ -1,0 +1,16 @@
+# Kaggle 占位配置（与 configs/e7_ablation.yaml 对齐）。
+# 计算设备说明：占位；意图 GPU 训练。接入后 runtime.device 建议 auto 或 cuda。
+
+experiment:
+  name: e7_ablation
+
+model:
+  student_checkpoint: /kaggle/working/checkpoints/e4_btcn_best.pth
+
+train:
+  ablation_target: rda
+
+output:
+  root_dir: /kaggle/working/Experiments
+
+notes: Placeholder config for E7.

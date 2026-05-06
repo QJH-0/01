@@ -1,0 +1,60 @@
+experiment:
+  name: e1_teacher_smoke_train
+data:
+  train_dir: DataIndex/mini_debug/train
+  valid_dir: DataIndex/mini_debug/val
+  root: null
+  speakers:
+  - mix_clean
+  - s1
+  - s2
+  train_start_index: 0
+  val_start_index: 0
+  train_max_examples: null
+  val_max_examples: null
+model:
+  name: conv_tasnet_teacher
+  pretrained_id: JorisCos/ConvTasNet_Libri2Mix_sepclean_8k
+  checkpoint_path: null
+  model_args:
+    n_src: 2
+    out_chan: null
+    n_blocks: 8
+    n_repeats: 3
+    bn_chan: 128
+    hid_chan: 512
+    skip_chan: 128
+    conv_kernel_size: 3
+    norm_type: gLN
+    mask_act: relu
+    in_chan: null
+    causal: false
+    fb_name: free
+    kernel_size: 16
+    n_filters: 512
+    stride: 8
+    encoder_activation: null
+    sample_rate: 8000
+runtime:
+  device: auto
+  precision: 32
+  batch_size: 1
+  num_workers: 0
+  pin_memory: null
+  train_shuffle: false
+  val_shuffle: false
+  seed: 42
+train:
+  lr: 1.0e-05
+  epochs: 2
+  monitor: val_loss
+  monitor_mode: min
+  optimizer:
+    name: adam
+    weight_decay: 0.0
+    betas:
+    - 0.9
+    - 0.999
+    eps: 1.0e-08
+output:
+  root_dir: Experiments
